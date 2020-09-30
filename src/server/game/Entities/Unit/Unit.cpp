@@ -3342,10 +3342,16 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
 {
     Aura* aura = aurApp->GetBase();
 
+    if (aura->GetSpellInfo()->Id == 47610 || aura->GetSpellInfo()->Id == 44614 )
+        TC_LOG_INFO("test.spell", "Unit::_ApplyAura check 1: SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", aura->GetSpellInfo()->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
+
     _RemoveNoStackAurasDueToAura(aura);
 
     if (aurApp->GetRemoveMode())
         return;
+
+    if (aura->GetSpellInfo()->Id == 47610 || aura->GetSpellInfo()->Id == 44614 )
+        TC_LOG_INFO("test.spell", "Unit::_ApplyAura check 2: SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", aura->GetSpellInfo()->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
 
     // Update target aura state flag
     if (AuraStateType aState = aura->GetSpellInfo()->GetAuraState())
@@ -3372,12 +3378,18 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
 
     aura->HandleAuraSpecificMods(aurApp, caster, true, false);
 
+    if (aura->GetSpellInfo()->Id == 47610 || aura->GetSpellInfo()->Id == 44614 )
+        TC_LOG_INFO("test.spell", "Unit::_ApplyAura check 3: SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", aura->GetSpellInfo()->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
+
     // apply effects of the aura
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (effMask & 1 << i && (!aurApp->GetRemoveMode()))
             aurApp->_HandleEffect(i, true);
     }
+
+    if (aura->GetSpellInfo()->Id == 47610 || aura->GetSpellInfo()->Id == 44614 )
+        TC_LOG_INFO("test.spell", "Unit::_ApplyAura check 4: SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", aura->GetSpellInfo()->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
 
     if (Player* player = ToPlayer())
         if (sConditionMgr->IsSpellUsedInSpellClickConditions(aurApp->GetBase()->GetId()))
