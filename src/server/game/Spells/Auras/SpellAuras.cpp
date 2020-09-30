@@ -300,7 +300,7 @@ uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 available
     return effMask & availableEffectMask;
 }
 
-Aura* Aura::TryRefreshStackOrCreate(AuraCreateInfo& createInfo)
+Aura* Aura::TryRefreshStackOrCreate(AuraCreateInfo& createInfo, bool updateEffectMask)
 {
     ASSERT_NODEBUGINFO(createInfo.Caster || createInfo.CasterGUID);
 
@@ -336,7 +336,8 @@ Aura* Aura::TryRefreshStackOrCreate(AuraCreateInfo& createInfo)
             if (createInfo._spellInfo && (createInfo._spellInfo->Id == 47610  || createInfo._spellInfo->Id == 44614 ))
                 TC_LOG_INFO("test.spell", "Test Aura::TryRefreshStackOrCreate (refresh): SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", createInfo._spellInfo->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
 
-            aurApp->UpdateApplyEffectMask(effMask);
+            if (updateEffectMask)
+                aurApp->UpdateApplyEffectMask(effMask);
         }
         return foundAura;
     }

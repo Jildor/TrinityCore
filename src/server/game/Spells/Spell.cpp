@@ -2862,7 +2862,7 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                     .SetOwnerEffectMask(aura_effmask)
                     .IsRefresh = &refresh;
 
-                if (Aura* aura = Aura::TryRefreshStackOrCreate(createInfo))
+                if (Aura* aura = Aura::TryRefreshStackOrCreate(createInfo, false))
                 {
                     hitInfo.HitAura = aura->ToUnitAura();
 
@@ -2899,6 +2899,9 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                     if (AuraApplication* aurApp = hitInfo.HitAura->GetApplicationOfTarget(unit->GetGUID()))
                         if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
                             TC_LOG_INFO("test.spell", "Spell::DoSpellEffectHit check 3: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", m_spellInfo->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+
+                    if (refresh)
+                        hitInfo.HitAura->AddStaticApplication(unit, aura_effmask);
                  }
             }
             else
