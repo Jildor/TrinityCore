@@ -86,7 +86,7 @@ public:
             //TrampleTimer
             if (TrampleTimer <= diff)
             {
-                DoCast(me, SPELL_TRAMPLE);
+                DoCast(nullptr, SPELL_TRAMPLE);
                 TrampleTimer = 8000;
             }
             else TrampleTimer -= diff;
