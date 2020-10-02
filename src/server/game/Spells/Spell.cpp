@@ -2384,6 +2384,9 @@ void Spell::TargetInfo::DoTargetSpellHit(Spell* spell, uint8 effIndex)
     if (spell->getState() == SPELL_STATE_DELAYED && !spell->IsPositive() && (GameTime::GetGameTimeMS() - TimeDelay) <= unit->m_lastSanctuaryTime)
         return;                                             // No missinfo in that case
 
+    if (spell->m_spellInfo->Id == 44614  || spell->m_spellInfo->Id == 47610)
+        TC_LOG_INFO("test.spell", "Spell::TargetInfo::DoTargetSpellHit check 1: SpellId: %d, effIndex: %d", spell->m_spellInfo->Id, effIndex);
+
     if (_spellHitTarget)
         spell->DoSpellEffectHit(_spellHitTarget, effIndex, *this);
 
@@ -2613,13 +2616,28 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
             if (AuraApplication* aurApp = HitAura->GetApplicationOfTarget(_spellHitTarget->GetGUID()))
             {
                 // only apply unapplied effects (for reapply case)
+                if (spell->m_spellInfo->Id == 44614  || spell->m_spellInfo->Id == 47610)
+                    TC_LOG_INFO("test.spell", "Spell::TargetInfo::DoDamageAndTriggers Refresh check 1: SpellId: %d, EffectMask: %d, Flags: %d, GetEffectMask: %d", spell->m_spellInfo->Id, EffectMask, aurApp->GetFlags(), aurApp->GetEffectMask());
+
                 uint8 effMask = EffectMask & aurApp->GetEffectsToApply();
+
+                if (spell->m_spellInfo->Id == 44614  || spell->m_spellInfo->Id == 47610)
+                    TC_LOG_INFO("test.spell", "Spell::TargetInfo::DoDamageAndTriggers Refresh check 2: SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", spell->m_spellInfo->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
+
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if ((effMask & (1 << i)) && aurApp->HasEffect(i))
                         effMask &= ~(1 << i);
 
                 if (effMask)
+                {
+                    if (spell->m_spellInfo->Id == 44614  || spell->m_spellInfo->Id == 47610)
+                        TC_LOG_INFO("test.spell", "Spell::TargetInfo::DoDamageAndTriggers Refresh check 3: SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", spell->m_spellInfo->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
+
                     _spellHitTarget->_ApplyAura(aurApp, effMask);
+
+                    if (spell->m_spellInfo->Id == 44614  || spell->m_spellInfo->Id == 47610)
+                        TC_LOG_INFO("test.spell", "Spell::TargetInfo::DoDamageAndTriggers Refresh check 4: SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", spell->m_spellInfo->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
+                }
             }
         }
 
@@ -2816,6 +2834,9 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
 {
     if (uint8 aura_effmask = Aura::BuildEffectMaskForOwner(m_spellInfo, 1 << effIndex, unit))
     {
+        if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
+            TC_LOG_INFO("test.spell", "Spell::DoSpellEffectHit check 1: SpellId: %d, aura_effmask: %d, effIndex: %d", m_spellInfo->Id, aura_effmask, effIndex);
+
         WorldObject* caster = m_caster;
         if (m_originalCaster)
             caster = m_originalCaster;
@@ -2845,6 +2866,10 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                 {
                     hitInfo.HitAura = aura->ToUnitAura();
 
+                    if (AuraApplication* aurApp = hitInfo.HitAura->GetApplicationOfTarget(unit->GetGUID()))
+                        if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
+                            TC_LOG_INFO("test.spell", "Spell::DoSpellEffectHit check 2: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", m_spellInfo->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+
                     // Set aura stack amount to desired value
                     if (m_spellValue->AuraStackAmount > 1)
                     {
@@ -2871,12 +2896,25 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                         hitInfo.HitAura->SetDuration(hitInfo.AuraDuration);
                     }
 
+                    if (AuraApplication* aurApp = hitInfo.HitAura->GetApplicationOfTarget(unit->GetGUID()))
+                        if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
+                            TC_LOG_INFO("test.spell", "Spell::DoSpellEffectHit check 3: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", m_spellInfo->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+
                     if (refresh)
                         hitInfo.HitAura->AddStaticApplication(unit, aura_effmask);
                 }
             }
             else
+            {
+                if (AuraApplication* aurApp = hitInfo.HitAura->GetApplicationOfTarget(unit->GetGUID()))
+                    if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
+                        TC_LOG_INFO("test.spell", "Spell::DoSpellEffectHit check 4: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", m_spellInfo->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
                 hitInfo.HitAura->AddStaticApplication(unit, aura_effmask);
+            }
+
+            if (AuraApplication* aurApp = hitInfo.HitAura->GetApplicationOfTarget(unit->GetGUID()))
+                if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
+                    TC_LOG_INFO("test.spell", "Spell::DoSpellEffectHit check 5: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", m_spellInfo->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
         }
     }
 

@@ -1084,9 +1084,17 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
     // register target/effect on aura
     AuraApplication* aurApp = _spellAura->GetApplicationOfTarget(unitTarget->GetGUID());
     if (!aurApp)
+    {
+        if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
+            TC_LOG_INFO("test.spell", "Test Spell::EffectApplyAura First application: SpellId: %d, effIndex: %d", m_spellInfo->Id, effIndex);
         aurApp = unitTarget->_CreateAuraApplication(_spellAura, 1 << effIndex);
+    }
     else
+    {
+        if (m_spellInfo->Id == 44614  || m_spellInfo->Id == 47610)
+            TC_LOG_INFO("test.spell", "Test Spell::EffectApplyAura Updated: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", m_spellInfo->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
         aurApp->UpdateApplyEffectMask(aurApp->GetEffectsToApply() | 1 << effIndex);
+    }
 }
 
 void Spell::EffectUnlearnSpecialization(SpellEffIndex effIndex)

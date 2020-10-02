@@ -332,8 +332,14 @@ Aura* Aura::TryRefreshStackOrCreate(AuraCreateInfo& createInfo, bool updateEffec
 
         // check effmask on owner application (if existing)
         if (updateEffectMask)
-            if (AuraApplication* aurApp = foundAura->GetApplicationOfTarget(unit->GetGUID()))
-                aurApp->UpdateApplyEffectMask(effMask);
+        {
+          if (AuraApplication* aurApp = foundAura->GetApplicationOfTarget(unit->GetGUID()))
+          {
+              if (createInfo._spellInfo && (createInfo._spellInfo->Id == 47610  || createInfo._spellInfo->Id == 44614 ))
+                  TC_LOG_INFO("test.spell", "Test Aura::TryRefreshStackOrCreate (refresh): SpellId: %d, effMask: %d, Flags: %d, GetEffectMask: %d", createInfo._spellInfo->Id, effMask, aurApp->GetFlags(), aurApp->GetEffectMask());
+                  aurApp->UpdateApplyEffectMask(effMask);
+          }
+        }
         return foundAura;
     }
     else
@@ -677,11 +683,25 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
     // register auras for units
     for (auto itr = targets.begin(); itr != targets.end();)
     {
+        if (GetSpellInfo() && (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 ))
+        {
+            uint8 effIndex = itr->second;
+            if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
+                TC_LOG_INFO("test.spell", "Test UpdateTargetMap check 1: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", GetSpellInfo()->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+        }
+
         bool addUnit = true;
         // check target immunities
         for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
             if (itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, caster))
                 itr->second &= ~(1 << effIndex);
+
+        if (GetSpellInfo() && (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 ))
+        {
+            uint8 effIndex = itr->second;
+            if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
+                TC_LOG_INFO("test.spell", "Test UpdateTargetMap check 2: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", GetSpellInfo()->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+        }
 
         if (!itr->second || itr->first->IsImmunedToSpell(GetSpellInfo(), caster) || !CanBeAppliedOn(itr->first))
             addUnit = false;
@@ -714,9 +734,25 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
         }
 
         if (!addUnit)
+        {
+            if (GetSpellInfo() && (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 ))
+            {
+                uint8 effIndex = itr->second;
+                if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
+                    TC_LOG_INFO("test.spell", "Test UpdateTargetMap check 3: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", GetSpellInfo()->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+            }
+
             itr = targets.erase(itr);
+        }
         else
         {
+            if (GetSpellInfo() && (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 ))
+            {
+                uint8 effIndex = itr->second;
+                if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
+                    TC_LOG_INFO("test.spell", "Test UpdateTargetMap check 4: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", GetSpellInfo()->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+            }
+
             // owner has to be in world, or effect has to be applied to self
             if (!GetOwner()->IsSelfOrInSameMap(itr->first))
             {
@@ -731,6 +767,13 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             {
                 // aura is already applied, this means we need to update effects of current application
                 itr->first->_UnapplyAura(aurApp, AURA_REMOVE_BY_DEFAULT);
+            }
+
+            if (GetSpellInfo() && (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 ))
+            {
+                uint8 effIndex = itr->second;
+                if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
+                    TC_LOG_INFO("test.spell", "Test UpdateTargetMap check 5: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", GetSpellInfo()->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
             }
 
             itr->first->_CreateAuraApplication(this, itr->second);
@@ -749,11 +792,25 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
     // apply aura effects for units
     for (auto itr = targets.begin(); itr!= targets.end(); ++itr)
     {
+        if (GetSpellInfo() && (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 ))
+        {
+            uint8 effIndex = itr->second;
+            if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
+                TC_LOG_INFO("test.spell", "Test UpdateTargetMap check 6: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", GetSpellInfo()->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
+        }
+
         if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
         {
             // owner has to be in world, or effect has to be applied to self
             ASSERT((!GetOwner()->IsInWorld() && GetOwner() == itr->first) || GetOwner()->IsInMap(itr->first));
             itr->first->_ApplyAura(aurApp, itr->second);
+        }
+
+        if (GetSpellInfo() && (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 ))
+        {
+            uint8 effIndex = itr->second;
+            if (AuraApplication* aurApp = GetApplicationOfTarget(itr->first->GetGUID()))
+                TC_LOG_INFO("test.spell", "Test UpdateTargetMap check 7: SpellId: %d, effIndex: %d, Flags: %d, GetEffectMask: %d", GetSpellInfo()->Id, effIndex, aurApp->GetFlags(), aurApp->GetEffectMask());
         }
     }
 }
@@ -2707,6 +2764,9 @@ void UnitAura::FillTargetMap(std::unordered_map<Unit*, uint8>& targets, Unit* ca
 
 void UnitAura::AddStaticApplication(Unit* target, uint8 effMask)
 {
+    if (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 )
+        TC_LOG_INFO("test.spell", "UnitAura::AddStaticApplication check 1: SpellId: %d, effMask: %d", GetSpellInfo()->Id, effMask);
+
     // only valid for non-area auras
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -2714,10 +2774,16 @@ void UnitAura::AddStaticApplication(Unit* target, uint8 effMask)
             effMask &= ~(1 << i);
     }
 
+    if (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 )
+        TC_LOG_INFO("test.spell", "UnitAura::AddStaticApplication check 2: SpellId: %d, effMask: %d", GetSpellInfo()->Id, effMask);
+
     if (!effMask)
         return;
 
     _staticApplications[target->GetGUID()] |= effMask;
+
+    if (GetSpellInfo()->Id == 47610  || GetSpellInfo()->Id == 44614 )
+        TC_LOG_INFO("test.spell", "UnitAura::AddStaticApplication check 3: SpellId: %d, effMask: %d", GetSpellInfo()->Id, effMask);
 }
 
 DynObjAura::DynObjAura(AuraCreateInfo const& createInfo)
