@@ -3322,6 +3322,14 @@ void Spell::cancel(SpellCastResult result /*= SPELL_FAILED_INTERRUPTED*/, Option
                         unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
             SendChannelUpdate(0);
+
+            if (m_originalCaster)
+            {
+                GameObject* ritual = m_originalCaster->GetGameObject(m_spellInfo->Id);
+                if (ritual && ritual->GetGoType() == GAMEOBJECT_TYPE_RITUAL)
+                    SendCastResult(result);
+            }
+
             SendInterrupted(result, resultOther);
 
             m_appliedMods.clear();
@@ -5171,10 +5179,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
 
         if (m_caster->ToUnit() && !m_caster->ToUnit()->GetSpellHistory()->IsReady(m_spellInfo, m_castItemEntry, IsIgnoringCooldowns()))
         {
-            if (m_triggeredByAuraSpell || (m_spellInfo->IsCooldownStartedOnEvent() && !m_caster->ToUnit()->GetSpellHistory()->HasCooldownOnHold(m_spellInfo->Id)))
+            if (m_triggeredByAuraSpell || m_spellInfo->IsCooldownStartedOnEvent())
                 return SPELL_FAILED_DONT_REPORT;
-
-            return SPELL_FAILED_NOT_READY;
+            else
+                return SPELL_FAILED_NOT_READY;
         }
     }
 
